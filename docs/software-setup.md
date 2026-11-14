@@ -15,7 +15,7 @@ Unicorn headset --Bluetooth--> Unicorn Suite (LSL app) --LSL--> neurogrip_bridge
 Either download the ZIP from the GitHub page (**Code → Download ZIP**) and unzip it, or:
 
 ```bash
-git clone https://github.com/<your-username>/neurogrip.git
+git clone https://github.com/m2eyre/neurogrip.git
 ```
 
 ## 2. Arduino IDE
