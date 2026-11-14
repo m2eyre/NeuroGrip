@@ -13,7 +13,7 @@ This folder has everything needed to rebuild the NeuroGrip landing page: a worki
 ## Three ways to put the site online
 
 1. **Base44 (what we did):** follow the steps below.
-2. **GitHub Pages, no builder at all:** turn on Pages for this repository (see the upload guide) and the page is live at `https://<your-username>.github.io/<repo-name>/website/neurogrip-reference-site.html`.
+2. **GitHub Pages, no builder at all:** turn on Pages for this repository (see the upload guide) and the page is live at `https://m2eyre.github.io/<repo-name>/website/neurogrip-reference-site.html`.
 3. **Any static host** (Netlify, Vercel, Cloudflare Pages): drag the `website/` folder in, and rename `neurogrip-reference-site.html` to `index.html` first.
 
 Things to fill in before it goes public: the demo video (section 03), team photos and names (section 06), and the links on the "Download the STLs" and "View on GitHub" buttons (point them at your repository's Releases page and main page).
