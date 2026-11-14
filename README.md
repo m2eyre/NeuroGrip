@@ -97,7 +97,7 @@ Prices are typical online prices in USD, not quotes. Check your own receipts bef
 You can try the software with no hardware at all.
 
 ```bash
-git clone https://github.com/<your-username>/neurogrip.git
+git clone https://github.com/m2eyre/neurogrip.git
 cd neurogrip/software
 python -m venv .venv
 # Windows:  .venv\Scripts\activate      Mac/Linux:  source .venv/bin/activate
