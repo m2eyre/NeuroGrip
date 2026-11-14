@@ -1,0 +1,92 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:transparent;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+import * as THREE from 'three';
+import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import * as BGU from 'three/addons/utils/BufferGeometryUtils.js';
+const q = new URLSearchParams(location.search);
+const ang = q.get('ang') || '14', W = +q.get('w') || 1600, H = +q.get('h') || 1200;
+const view = q.get('view') || 'hero', ball = q.get('ball') === '1', bg = q.get('bg');
+const theme = q.get('theme') || 'brand';
+const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: !bg, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1); renderer.setSize(W, H);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.VSMShadowMap;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+if (bg) scene.background = new THREE.Color(bg);
+const pm = new THREE.PMREMGenerator(renderer);
+scene.environment = pm.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+scene.environmentIntensity = 0.38;
+const cam = new THREE.PerspectiveCamera(q.get('fov') ? +q.get('fov') : 24, W / H, 1, 2000);
+cam.up.set(0, 0, 1);
+const key = new THREE.DirectionalLight(0xffffff, 2.6); key.position.set(-170, -150, 150); key.castShadow = true;
+key.shadow.mapSize.set(4096, 4096); key.shadow.radius = 14; key.shadow.blurSamples = 25; key.shadow.bias = -0.0004;
+Object.assign(key.shadow.camera, { left: -120, right: 120, top: 120, bottom: -120, near: 1, far: 600 });
+scene.add(key);
+const rim = new THREE.DirectionalLight(0xcfc2ff, 1.4); rim.position.set(150, 160, 90); scene.add(rim);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb9a5ff, 0.35));
+const PAL = {
+  brand: {
+    driver: { color: 0x5B36FF, roughness: .5, clearcoat: .1, clearcoatRoughness: .5 },
+    idler:  { color: 0x6A45FF, roughness: .5, clearcoat: .1, clearcoatRoughness: .5 },
+    base:   { color: 0xFBFAFF, roughness: .45 },
+    wrist:  { color: 0x2E2650, roughness: .55, clearcoat: .2 },
+    servo:  { color: 0x0F0C1C, roughness: .35 },
+  }
+}[theme];
+const loader = new STLLoader();
+const grp = new THREE.Group(); scene.add(grp);
+const parts = ['wrist', 'base', 'servo', 'driver', 'idler'];
+await Promise.all(parts.map(p => new Promise(res => loader.load(`p_${ang}_${p}.stl`, g => {
+  g.deleteAttribute('normal'); g = BGU.mergeVertices(g, 1e-4);
+  g = BGU.toCreasedNormals(g, Math.PI / 5.5);
+  const m = new THREE.Mesh(g, new THREE.MeshPhysicalMaterial(PAL[p]));
+  m.castShadow = m.receiveShadow = true; grp.add(m); res();
+}))));
+if (ball) {
+  const info = await (await fetch('info.json')).json(); const I = info[ang];
+  const r = I.gap / 2 - 0.4;
+  const s = new THREE.Mesh(new THREE.SphereGeometry(r, 128, 64), new THREE.MeshPhysicalMaterial({ color: 0xFFFFFF, roughness: .15, clearcoat: 1, transmission: 0, sheen: .4, sheenColor: new THREE.Color(0xF4C6EA) }));
+  s.position.set(...I.c); s.castShadow = true; grp.add(s);
+}
+// ground (shadow catcher) under the wrist saddle
+const groundZ = -46;
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(2000, 2000), new THREE.ShadowMaterial({ opacity: .22, color: 0x3B2A8F }));
+ground.position.z = groundZ; ground.receiveShadow = true; if (q.get('ground') !== '0') scene.add(ground);
+const box0 = new THREE.Box3().setFromObject(grp);
+ground.position.z = box0.min.z;
+if (q.get('ground') !== '0') {
+  const cv = document.createElement('canvas'); cv.width = cv.height = 512; const cx = cv.getContext('2d');
+  const gr = cx.createRadialGradient(256, 256, 0, 256, 256, 256); gr.addColorStop(0, 'rgba(40,24,110,.42)'); gr.addColorStop(.45, 'rgba(40,24,110,.16)'); gr.addColorStop(1, 'rgba(40,24,110,0)');
+  cx.fillStyle = gr; cx.fillRect(0, 0, 512, 512);
+  const cs = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, depthWrite: false }));
+  const c0 = box0.getCenter(new THREE.Vector3()), s0 = box0.getSize(new THREE.Vector3());
+  cs.scale.set(s0.x * 1.5, s0.y * 1.25, 1); cs.position.set(c0.x, c0.y, box0.min.z + 0.05); scene.add(cs);
+}
+const box = new THREE.Box3().setFromObject(grp); const c = box.getCenter(new THREE.Vector3());
+const V = {
+  hero: [-0.95, -1.15, 0.75], three4: [1.0, -1.25, 0.7], side: [1.6, -0.25, 0.35], top: [0.0001, -0.05, 1], front: [0.0, -1.6, 0.45], low: [-1.2, -0.9, 0.35]
+}[view];
+const dist = +(q.get('dist') || 330);
+const dir = new THREE.Vector3(...V).normalize();
+cam.position.copy(c).addScaledVector(dir, dist);
+const tgt = c.clone(); tgt.z += +(q.get('tz') || 0); tgt.x += +(q.get('tx') || 0); tgt.y += +(q.get('ty') || 0);
+cam.lookAt(tgt);
+renderer.render(scene, cam);
+const info2 = await (await fetch('info.json')).json();
+const A = {};
+const proj = (n, v) => { const p = new THREE.Vector3(...v).project(cam); A[n] = [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H]; };
+const I2 = info2[ang] || info2['14'];
+proj('ball', [I2.c[0] + I2.gap * .3, I2.c[1] + I2.gap * .2, I2.c[2] + I2.gap * .35]);
+proj('gear', [-12.5 + 21.2 + 9, 8 + 4, 11.5 + 32.5 + 6]);
+proj('servo', [-12.5, 8 - 10, 11.5 + 14]);
+proj('wrist', [-30, 30, -8]);
+proj('jaw', [I2.c[0] - I2.gap / 2 - 2, I2.c[1] + 9, I2.c[2] + 3]);
+window.ANCH = A;
+window.DONE = true;
+</script></body></html>
