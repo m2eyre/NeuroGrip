@@ -1,0 +1,5 @@
+gpype[all]>=4.2.0
+numpy
+scipy
+matplotlib
+pyserial
