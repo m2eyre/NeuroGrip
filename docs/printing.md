@@ -4,10 +4,10 @@ All four parts are in [`hardware/stl/`](../hardware/stl). They are already in pr
 
 | File | Part | Size (mm) | Solid volume |
 |---|---|---|---|
-| `NG_Base.stl` | Servo cradle, idler pillar, rail screw holes | 36 × 37 × 32 | 19.4 cm³ |
+| `NG_Base.stl` | Servo cradle, idler pillar with snap pin, dovetail groove | 36 × 37 × 42 | 21.4 cm³ |
 | `NG_FingerDriver.stl` | Finger + 14T gear, with the servo-horn pocket | 24 × 60 × 6 | 3.2 cm³ |
-| `NG_FingerIdler.stl` | Mirrored finger + 14T gear, with the M3 pivot hole | 24 × 60 × 6 | 3.6 cm³ |
-| `NG_WristMount.stl` | Curved wrist saddle with the T-slot rail and strap slots | 75 × 33 × 60 | 39.1 cm³ |
+| `NG_FingerIdler.stl` | Mirrored finger + 14T gear, with the 5.4 mm snap-pin hole | 24 × 60 × 6 | 3.5 cm³ |
+| `NG_WristMount.stl` | Curved wrist saddle with the dovetail rail, lock holes and strap slots | 75 × 34 × 60 | 35.0 cm³ |
 
 Expect about 35–45 g of filament for the set with the settings below.
 
@@ -36,7 +36,8 @@ Why these choices:
 
 - **4 walls on the fingers** means the gear teeth (module 1.5) are printed as solid plastic, not infill.
 - **The wrist mount stands on its end** so the curved saddle and the rail profile print as clean outlines and the rail is strong along its length. It is tall and narrow, so the brim stops it from tipping.
-- **No supports:** the strap slots, wire windows and the rail channel only need short bridges of 3–8.5 mm, which any printer handles.
+- **No supports:** the strap slots, wire windows and the dovetail groove under the base only need short bridges (about 13 mm at most) and gentle slopes, which any printer handles. The snap pin on the base prints standing up, and its barb is only a 0.45 mm ledge.
+- **The snap pin is the weakest part.** If it breaks, print the base in PETG or with 4 walls so the pin comes out solid.
 
 ## Tolerances
 
@@ -46,9 +47,9 @@ If parts are too tight:
 
 1. **Elephant's foot** (first layer squashed outward) is the usual cause on the fingers. Turn on your slicer's elephant-foot compensation (about 0.15 mm) or lightly file the bottom edge of the gear.
 2. If the servo horn won't go into the driver finger's pocket, use horizontal expansion / XY compensation of −0.05 to −0.1 mm on that part only, or open the pocket with a craft knife.
-3. If the gears bind, check that the idler pivot screw isn't overtightened before you blame the print.
+3. If the base won't slide onto the rail, the usual cause is elephant's foot on the edges of the groove. Shave them with a knife.
 
-If the horn is loose in the pocket, a drop of CA (super) glue fixes it.
+The horn pocket in the driver finger is a press fit with crush ribs (`HORN_FIT` 0.1 mm plus 0.35 mm ribs). If the horn is still loose, raise `RIB_IN` to 0.5 and re-export, or add a drop of CA glue. If it's too tight, shave the ribs.
 
 ## Test before printing everything
 

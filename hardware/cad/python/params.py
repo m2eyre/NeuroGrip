@@ -17,18 +17,23 @@ HORN_SEAT = 29.5          # underside of horn arm above servo bottom = gear bott
 FIT = 0.25               # clearance per side for pockets
 # horn pocket (single-arm SG90 horn)
 HORN_HUB_D, HORN_LEN, HORN_W0, HORN_W1, HORN_DEPTH = 7.6, 17.5, 6.4, 4.6, 2.0
+HORN_FIT = 0.10                   # clearance per side on the horn arm (was FIT = 0.25)
+RIB_D, RIB_IN = 1.2, 0.35         # crush ribs: diameter, and how far they stick into the pocket
+RIB_POS = (0.45, 0.85)            # rib positions along the arm (fraction of HORN_LEN), both sides + 1 at the tip
 # base
-FLOOR = 3.0
+FLOOR = 5.0                       # floor under the servo (dovetail groove runs below it)
 DECK = FLOOR + SV_TAB_Z           # 18.9 deck top (tabs rest here)
 GEAR_Z = FLOOR + HORN_SEAT        # 32.5 gear bottom in base frame
 BASE_X0, BASE_X1, BASE_D0, BASE_D1 = -9.5, CD + 5.5, -24.0, 13.0
 PILLAR_D, PILLAR_BOSS_D, PILLAR_GAP = 10.0, 6.0, 0.3
-PIVOT_PILOT_D = 2.6               # M3 self-tap pilot
-RAIL_X = 12.5                     # rail axis in base frame
-MOUNT_HOLES_D = (2.0, -18.0)
-CB_D, CB_FLOOR = 6.6, 5.0
-M3_CLR = 3.4
-WIRE_W, WIRE_TOP = 8.5, 12.5
+# printed snap-fit pivot pin on the pillar (replaces the M3 screw)
+PIN_D, PIN_HOLE_D, PIN_BARB_D, PIN_SLOT_W = 5.0, 5.4, 5.9, 1.6
+RAIL_X = 14.0                     # dovetail axis in base frame
+WIRE_W, WIRE_TOP = 8.5, FLOOR + 9.5
+# dovetail slide (tongue on wrist mount, groove under base)
+DT_NECK, DT_TOP, DT_H, DT_FIT = 8.0, 12.0, 4.5, 0.25
+LOCK_PIN_D = 2.2                  # cross hole for a 1.75 mm filament locking pin
+LOCK_PITCH, LOCK_N = 6.0, 4       # wrist holes at 0, +-6, +-12 ... +-24
 # finger (driver, local frame, pivot at origin, d forward)
 JAW_IN, JAW_OUT, JAW_D0, JAW_D1 = CD/2 - 1.0, CD/2 - 8.0, 26.0, 48.0
 FINGER_POLY = [(5.5,-1.5),(JAW_IN,JAW_D0),(JAW_IN,JAW_D1),(JAW_OUT,JAW_D1),(JAW_OUT,JAW_D0),(-5.5,1.5)]
@@ -38,8 +43,7 @@ NOTCH_DEPTH = 1.2
 WR_RI, WR_T, WR_ANG = 38.0, 3.5, 65.0
 WR_LEN = 60.0
 RAIL_W = 40.0
-SLOT_W, LIP, CH_W, CH_H, CH_FLOOR = 3.4, 2.5, 5.9, 4.0, 5.0
-RAIL_TOP = CH_FLOOR + CH_H + LIP   # 11.5
+RAIL_TOP = 8.0                     # top of the flat platform (base sits here)
 STRAP_X0, STRAP_X1, STRAP_LEN = 29.0, 33.0, 26.0
 
 def gear_points(phase_deg, n_flank=7, n_root=4):

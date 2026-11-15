@@ -2,6 +2,8 @@ Attribute VB_Name = "NeuroGrip_Build"
 '==============================================================================
 ' NeuroGrip  -  two-finger gear gripper (1x SG90) + adjustable wrist mount
 ' SolidWorks VBA macro: builds 5 parts and a movable assembly.
+' v2: screwless. Base slides onto a dovetail rail (locked with a 1.75 mm filament pin),
+'     idler finger snaps onto a printed split pin. Only the SG90 tab/horn screws remain.
 '
 ' HOW TO RUN
 '   1. SolidWorks > Tools > Macro > New...  save as NeuroGrip.swp in an EMPTY folder
@@ -49,24 +51,34 @@ Const HORN_LEN As Double = 17.5        ' hub centre to arm tip centre
 Const HORN_W0 As Double = 6.4          ' arm width at hub
 Const HORN_W1 As Double = 4.6          ' arm width at tip
 Const HORN_DEPTH As Double = 2#
+Const HORN_FIT As Double = 0.1         ' clearance per side on the horn arm (tight)
+Const RIB_D As Double = 1.2            ' crush ribs inside the horn pocket
+Const RIB_IN As Double = 0.35          ' how far each rib sticks into the pocket (squeeze = RIB_IN - HORN_FIT)
 
 ' ---- base ----
-Const FLOOR_T As Double = 3#
+Const FLOOR_T As Double = 5#          ' floor under the servo (dovetail groove runs below it)
 Const BASE_X0 As Double = -9.5
 Const BASE_D0 As Double = -24#
 Const BASE_D1 As Double = 13#
 Const PILLAR_D As Double = 10#
 Const PILLAR_BOSS_D As Double = 6#
 Const PILLAR_GAP As Double = 0.3
-Const PIVOT_PILOT_D As Double = 2.6    ' M3 self-tapping pilot
-Const RAIL_X As Double = 12.5          ' rail axis in base frame
-Const MOUNT_HOLE_D1 As Double = 2#
-Const MOUNT_HOLE_D2 As Double = -18#
-Const CB_D As Double = 6.6
-Const CB_FLOOR As Double = 5#
-Const M3_CLR As Double = 3.4
+Const PIN_D As Double = 5#             ' printed snap pin shank (idler pivot)
+Const PIN_HOLE_D As Double = 5.4       ' hole in the idler gear
+Const PIN_BARB_D As Double = 5.9       ' barb that snaps over the idler gear
+Const PIN_SLOT_W As Double = 1.6       ' split that lets the pin squeeze in
+Const RAIL_X As Double = 14#           ' dovetail axis in base frame
 Const WIRE_W As Double = 8.5
-Const WIRE_TOP As Double = 12.5
+Const WIRE_ABOVE_FLOOR As Double = 9.5 ' height of the cable windows above the servo bottom
+
+' ---- dovetail slide (tongue on wrist mount, groove under base) ----
+Const DT_NECK As Double = 8#
+Const DT_TOP As Double = 12#
+Const DT_H As Double = 4.5
+Const DT_FIT As Double = 0.25          ' clearance per side in the groove
+Const LOCK_PIN_D As Double = 2.2       ' cross hole for a 1.75 mm filament lock pin
+Const LOCK_PITCH As Double = 6#        ' rail lock holes every 6 mm
+Const LOCK_N As Long = 4               ' holes at 0, +-6 ... +-24
 
 ' ---- fingers ----
 Const JAW_D0 As Double = 26#
@@ -81,11 +93,7 @@ Const WR_T As Double = 3.5
 Const WR_ANG As Double = 65#           ' half angle of the saddle
 Const WR_LEN As Double = 60#
 Const RAIL_W As Double = 40#
-Const SLOT_W As Double = 3.4
-Const LIP As Double = 2.5
-Const CH_W As Double = 5.9             ' < M3 nut corner width, so nuts cannot spin
-Const CH_H As Double = 4#
-Const CH_FLOOR As Double = 5#
+Const RAIL_PLAT As Double = 8#        ' top of the flat platform the base sits on
 Const STRAP_X0 As Double = 29#
 Const STRAP_X1 As Double = 33#
 Const STRAP_LEN As Double = 26#        ' for 25 mm velcro
@@ -113,7 +121,7 @@ Sub main()
     CD = G_M * G_Z + CD_EXTRA
     DECK = FLOOR_T + SV_TAB_Z
     GEAR_Z = FLOOR_T + HORN_SEAT
-    RAIL_TOP = CH_FLOOR + CH_H + LIP
+    RAIL_TOP = RAIL_PLAT
     BASE_X1 = CD + 5.5
     JAW_IN = CD / 2 - JAW_GAP / 2
     JAW_OUT = JAW_IN - JAW_W
@@ -361,7 +369,8 @@ End Sub
 
 '============================== parts =========================================
 Function BuildBase() As String
-    Dim m As Object, pc As Double, top As Double
+    Dim m As Object, pc As Double, top As Double, shankTop As Double
+    Dim sl As Double, g0 As Double, g1 As Double, x1 As Double, x2 As Double, lockPl As String
     Set m = NewDoc(False): Set PlaneList = New Collection
     RenameDefaultPlanes m
     pc = -SV_SHAFT_OFF
@@ -378,7 +387,7 @@ Function BuildBase() As String
 
     ' wire windows through both end walls
     BeginSketch m, "PFront"
-    Rect m, -WIRE_W / 2, FLOOR_T, WIRE_W / 2, WIRE_TOP
+    Rect m, -WIRE_W / 2, FLOOR_T, WIRE_W / 2, FLOOR_T + WIRE_ABOVE_FLOOR
     CutMid m, EndSketch(m), 200
 
     ' servo tab pilot holes (use the screws that come with the SG90)
@@ -387,17 +396,26 @@ Function BuildBase() As String
     Circ m, 0, pc + SV_TAB_HOLE_PITCH / 2, 1.8
     CutBetween m, DECK - 6, DECK + 6
 
-    ' rail screw holes + counterbores
-    BeginBetween m, -1, DECK + 1
-    Circ m, RAIL_X, MOUNT_HOLE_D1, M3_CLR
-    Circ m, RAIL_X, MOUNT_HOLE_D2, M3_CLR
-    CutBetween m, -1, DECK + 1
-    BeginBetween m, CB_FLOOR, DECK + 3
-    Circ m, RAIL_X, MOUNT_HOLE_D1, CB_D
-    Circ m, RAIL_X, MOUNT_HOLE_D2, CB_D
-    CutBetween m, CB_FLOOR, DECK + 3
+    ' dovetail groove along the whole underside (slides onto the wrist rail)
+    sl = (DT_TOP - DT_NECK) / 2 / DT_H
+    g0 = DT_NECK / 2 + DT_FIT - sl            ' half width at h = -1
+    g1 = DT_TOP / 2 + DT_FIT + sl * 0.3       ' half width at h = DT_H + 0.3
+    BeginSketch m, "PFront"
+    Ln m, RAIL_X - g0, -1, RAIL_X + g0, -1
+    Ln m, RAIL_X + g0, -1, RAIL_X + g1, DT_H + 0.3
+    Ln m, RAIL_X + g1, DT_H + 0.3, RAIL_X - g1, DT_H + 0.3
+    Ln m, RAIL_X - g1, DT_H + 0.3, RAIL_X - g0, -1
+    CutMid m, EndSketch(m), 200
 
-    ' idler pivot pillar + friction boss + M3 pilot
+    ' lock-pin hole across the groove (blind on the servo side), at the base's Front plane
+    x1 = RAIL_X - DT_TOP / 2 - 0.8: x2 = BASE_X1 + 2
+    lockPl = MakePlane(m, "PRight", (x1 + x2) / 2, "B_LockPinPlane")
+    PlaneList.Add lockPl
+    BeginSketch m, lockPl
+    Circ m, 0, DT_H / 2, LOCK_PIN_D
+    CutMid m, EndSketch(m), x2 - x1
+
+    ' idler pillar + friction boss + printed split snap pin
     top = GEAR_Z - PILLAR_GAP
     BeginBetween m, DECK - 0.5, top - 0.5
     Circ m, CD, 0, PILLAR_D
@@ -405,19 +423,33 @@ Function BuildBase() As String
     BeginBetween m, top - 1, top
     Circ m, CD, 0, PILLAR_BOSS_D
     BossBetween m, top - 1, top
-    BeginBetween m, top - 12, top + 1
-    Circ m, CD, 0, PIVOT_PILOT_D
-    CutBetween m, top - 12, top + 1
+    shankTop = GEAR_Z + GEAR_T + 0.3
+    BeginBetween m, top - 0.5, shankTop
+    Circ m, CD, 0, PIN_D
+    BossBetween m, top - 0.5, shankTop
+    ' stepped barb (printable ramp): wide at the bottom so it hooks over the gear
+    BeginBetween m, shankTop - 0.01, shankTop + 0.6
+    Circ m, CD, 0, PIN_BARB_D
+    BossBetween m, shankTop - 0.01, shankTop + 0.6
+    BeginBetween m, shankTop + 0.59, shankTop + 1.1
+    Circ m, CD, 0, (PIN_BARB_D + PIN_D) / 2 + 0.05
+    BossBetween m, shankTop + 0.59, shankTop + 1.1
+    BeginBetween m, shankTop + 1.09, shankTop + 1.6
+    Circ m, CD, 0, PIN_D - 0.3
+    BossBetween m, shankTop + 1.09, shankTop + 1.6
+    ' split the pin so it can squeeze through the gear
+    BeginBetween m, top - 2, shankTop + 3
+    Rect m, CD - PIN_SLOT_W / 2, -10, CD + PIN_SLOT_W / 2, 10
+    CutBetween m, top - 2, shankTop + 3
 
     ' mate references
     MakePlane m, "PTop", FLOOR_T, "B_PocketFloor"
     MakePlane m, "PTop", GEAR_Z, "B_GearPlane"
     MakePlane m, "PRight", CD, "B_IdlerX"
     MakePlane m, "PRight", RAIL_X, "B_RailX"
-    MakePlane m, "PFront", -(MOUNT_HOLE_D1 + MOUNT_HOLE_D2) / 2, "B_RailMid"
     MakeAxis m, "B_IdlerX", "PFront", "B_IdlerAxis"
     PlaneList.Add "B_PocketFloor": PlaneList.Add "B_GearPlane": PlaneList.Add "B_IdlerX"
-    PlaneList.Add "B_RailX": PlaneList.Add "B_RailMid"
+    PlaneList.Add "B_RailX"
     HidePlanes m
     BuildBase = SavePart(m, "NG_Base")
 End Function
@@ -455,7 +487,7 @@ End Function
 Function BuildFinger(isDriver As Boolean) As String
     Dim m As Object, s As Double, ph As Double
     Dim jx As Double, L As Double, ux As Double, uy As Double, nx As Double, ny As Double
-    Dim h0 As Double, h1 As Double, ex As Double, ey As Double
+    Dim h0 As Double, h1 As Double, ex As Double, ey As Double, ro As Double, t As Double, hh As Double
     Dim px(1 To 6) As Double, py(1 To 6) As Double, i As Long
     Set m = NewDoc(False): Set PlaneList = New Collection
     RenameDefaultPlanes m
@@ -490,7 +522,7 @@ Function BuildFinger(isDriver As Boolean) As String
         ' horn arm pocket in the bottom face (print this face UP)
         jx = (JAW_IN + JAW_OUT) / 2: L = Sqr(jx * jx + JAW_D0 * JAW_D0)
         ux = jx / L: uy = JAW_D0 / L: nx = uy: ny = -ux
-        h0 = HORN_W0 / 2 + FIT: h1 = HORN_W1 / 2 + FIT
+        h0 = HORN_W0 / 2 + HORN_FIT: h1 = HORN_W1 / 2 + HORN_FIT
         ex = ux * HORN_LEN: ey = uy * HORN_LEN
         BeginSketch m, "PTop"
         Ln m, -nx * h0, -ny * h0, nx * h0, ny * h0
@@ -499,13 +531,24 @@ Function BuildFinger(isDriver As Boolean) As String
                                   mm(ex - nx * h1), mm(ey - ny * h1), 0, 1
         Ln m, ex - nx * h1, ey - ny * h1, -nx * h0, -ny * h0
         CutMid m, EndSketch(m), 2 * HORN_DEPTH
+        ' crush ribs: 2 each side + 1 at the tip, squeezed by the horn for a press fit
+        ro = RIB_D / 2 - RIB_IN
+        BeginBetween m, 0, HORN_DEPTH
+        For i = 0 To 1
+            t = IIf(i = 0, 0.45, 0.85)
+            hh = h0 + (h1 - h0) * t
+            Circ m, ux * HORN_LEN * t + nx * (hh + ro), uy * HORN_LEN * t + ny * (hh + ro), RIB_D
+            Circ m, ux * HORN_LEN * t - nx * (hh + ro), uy * HORN_LEN * t - ny * (hh + ro), RIB_D
+        Next
+        Circ m, ux * (HORN_LEN + h1 + ro), uy * (HORN_LEN + h1 + ro), RIB_D
+        BossBetween m, 0, HORN_DEPTH
         ' hub / screwdriver hole
         BeginBetween m, -1, GEAR_T + 1
         Circ m, 0, 0, HORN_HUB_D + 2 * FIT
         CutBetween m, -1, GEAR_T + 1
     Else
         BeginBetween m, -1, GEAR_T + 1
-        Circ m, 0, 0, M3_CLR
+        Circ m, 0, 0, PIN_HOLE_D
         CutBetween m, -1, GEAR_T + 1
     End If
 
@@ -515,15 +558,13 @@ Function BuildFinger(isDriver As Boolean) As String
 End Function
 
 Function BuildWristMount() As String
-    Dim m As Object, ro As Double, cy As Double, a As Double, ar As Double, xr As Double
-    Dim hs As Double, hc As Double
+    Dim m As Object, ro As Double, cy As Double, a As Double, ar As Double, xr As Double, k As Long
     Set m = NewDoc(False): Set PlaneList = New Collection
     RenameDefaultPlanes m
     ro = WR_RI + WR_T: cy = -WR_RI: a = WR_ANG * PI / 180#
     xr = RAIL_W / 2: ar = Atn((xr / ro) / Sqr(1 - (xr / ro) ^ 2))
-    hs = SLOT_W / 2: hc = CH_W / 2
 
-    ' saddle + T-slot rail profile on the Front plane, extruded along the forearm
+    ' saddle + dovetail rail profile on the Front plane, extruded along the forearm
     BeginSketch m, "PFront"
     With m.SketchManager
         ' inner arc, left end -> right end over the top (clockwise)
@@ -536,15 +577,11 @@ Function BuildWristMount() As String
                    mm(ro * Sin(ar)), mm(cy + ro * Cos(ar)), 0, 1
     End With
     Ln m, xr, cy + ro * Cos(ar), xr, RAIL_TOP
-    Ln m, xr, RAIL_TOP, hs, RAIL_TOP
-    Ln m, hs, RAIL_TOP, hs, RAIL_TOP - LIP
-    Ln m, hs, RAIL_TOP - LIP, hc, RAIL_TOP - LIP
-    Ln m, hc, RAIL_TOP - LIP, hc, CH_FLOOR
-    Ln m, hc, CH_FLOOR, -hc, CH_FLOOR
-    Ln m, -hc, CH_FLOOR, -hc, RAIL_TOP - LIP
-    Ln m, -hc, RAIL_TOP - LIP, -hs, RAIL_TOP - LIP
-    Ln m, -hs, RAIL_TOP - LIP, -hs, RAIL_TOP
-    Ln m, -hs, RAIL_TOP, -xr, RAIL_TOP
+    Ln m, xr, RAIL_TOP, DT_NECK / 2, RAIL_TOP
+    Ln m, DT_NECK / 2, RAIL_TOP, DT_TOP / 2, RAIL_TOP + DT_H
+    Ln m, DT_TOP / 2, RAIL_TOP + DT_H, -DT_TOP / 2, RAIL_TOP + DT_H
+    Ln m, -DT_TOP / 2, RAIL_TOP + DT_H, -DT_NECK / 2, RAIL_TOP
+    Ln m, -DT_NECK / 2, RAIL_TOP, -xr, RAIL_TOP
     Ln m, -xr, RAIL_TOP, -xr, cy + ro * Cos(ar)
     With m.SketchManager
         ' outer arc rail side -> left end (counter-clockwise)
@@ -560,6 +597,13 @@ Function BuildWristMount() As String
     Rect m, STRAP_X0, -STRAP_LEN / 2, STRAP_X1, STRAP_LEN / 2
     Rect m, -STRAP_X1, -STRAP_LEN / 2, -STRAP_X0, STRAP_LEN / 2
     CutMid m, EndSketch(m), 200
+
+    ' lock-pin cross holes through the tongue every LOCK_PITCH mm
+    BeginSketch m, "PRight"
+    For k = -LOCK_N To LOCK_N
+        Circ m, k * LOCK_PITCH, RAIL_TOP + DT_H / 2, LOCK_PIN_D
+    Next
+    CutMid m, EndSketch(m), 2 * DT_TOP
 
     MakePlane m, "PTop", RAIL_TOP, "W_RailTop"
     PlaneList.Add "W_RailTop"
@@ -640,13 +684,13 @@ Sub BuildAssembly(pBase As String, pServo As String, pDrv As String, pIdl As Str
     sW = "@" & compW.Name2 & "@" & t: sB = "@" & compB.Name2 & "@" & t: sS = "@" & compS.Name2 & "@" & t
     sDv = "@" & compD.Name2 & "@" & t: sId = "@" & compI.Name2 & "@" & t
 
-    ' base on the rail: sits on top, centred on the slot, slides along it (limit 0..15 mm)
+    ' base on the dovetail rail: sits on the platform, centred on the tongue, slides along it
     AddMateX asm, "PTop" & sB, "PLANE", "W_RailTop" & sW, "PLANE", 0, False, 0, 0, 0, 0, 0, 0, 0, 0, "Base_on_Rail"
-    AddMateX asm, "B_RailX" & sB, "PLANE", "PRight" & sW, "PLANE", 0, False, 0, 0, 0, 0, 0, 0, 0, 0, "Base_in_Slot"
-    ok = AddMateX(asm, "B_RailMid" & sB, "PLANE", "PFront" & sW, "PLANE", 5, False, mm(5), mm(15), 0, 0, 0, 0, 0, 0, "Slide_Limit_0-15mm")
+    AddMateX asm, "B_RailX" & sB, "PLANE", "PRight" & sW, "PLANE", 0, False, 0, 0, 0, 0, 0, 0, 0, 0, "Base_on_Dovetail"
+    ok = AddMateX(asm, "PFront" & sB, "PLANE", "PFront" & sW, "PLANE", 5, False, mm(LOCK_PITCH), mm(LOCK_N * LOCK_PITCH), 0, 0, 0, 0, 0, 0, "Slide_Limit")
     If Not ok Then
         LogMsg "Slide limit mate not supported here; used a coincident mate (suppress it to slide)."
-        AddMateX asm, "B_RailMid" & sB, "PLANE", "PFront" & sW, "PLANE", 0, False, 0, 0, 0, 0, 0, 0, 0, 0, "Slide_Position"
+        AddMateX asm, "PFront" & sB, "PLANE", "PFront" & sW, "PLANE", 0, False, 0, 0, 0, 0, 0, 0, 0, 0, "Slide_Position"
     End If
 
     ' servo in pocket

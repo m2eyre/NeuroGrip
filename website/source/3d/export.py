@@ -12,7 +12,7 @@ for ang in (0, 14, 25, 32):
 # jaw gap centre for a held object at 14 deg (in assembly frame)
 def jaw(ang, d):
     a = math.radians(ang)
-    off = np.array((-RAIL_X, -sum(MOUNT_HOLES_D)/2, RAIL_TOP))
+    off = np.array((-RAIL_X, 0.0, RAIL_TOP))
     p = (JAW_IN*math.cos(a) - d*math.sin(a), JAW_IN*math.sin(a) + d*math.cos(a))
     q0 = (CD - JAW_IN, d); a2 = -a
     q = (CD + (q0[0]-CD)*math.cos(a2) - q0[1]*math.sin(a2), (q0[0]-CD)*math.sin(a2) + q0[1]*math.cos(a2))

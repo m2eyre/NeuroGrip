@@ -1,0 +1,38 @@
+NEUROGRIP: ElevenLabs narration (make these once on elevenlabs.io, then upload the MP3s to Base44)
+
+Settings: one calm, warm voice for every clip (for example "Rachel" or "Brian").
+Model: Eleven Multilingual v2. Stability about 50%, Similarity about 75%, Style 0.
+Download each clip as MP3 and name it exactly as shown below.
+In total this is about 1,000 characters, which fits in the free 10,000-characters-a-month tier.
+
+--------------------------------------------------------------
+story.mp3   (plays from the "Hear its story" buttons)
+--------------------------------------------------------------
+Picking up a cup shouldn't be a privilege. Meet NeuroGrip.
+Millions of people live with limb loss, and the most advanced arms cost as much as a car.
+NeuroGrip is a hand you can print tonight, with a grip you control with a signal.
+Your headset reads the signal. Our software decodes it. The gripper closes.
+Two fingers, one motor, and a mount that straps on in seconds.
+NeuroGrip was built in twenty-four hours at Hack the Nest. Imagine it with a year.
+The files are open. Print one. Improve it. Pass it on.
+
+--------------------------------------------------------------
+Calibration clips (one per step in the "Calibrate" section)
+--------------------------------------------------------------
+calib-1.mp3
+Welcome. Let's teach NeuroGrip your signal. This takes about two minutes.
+
+calib-2.mp3
+Sit comfortably, and relax your face and shoulders. I'm listening to your resting signal now.
+
+calib-3.mp3
+Good. Now, when you hear the tone, give your grip signal and hold it for one second.
+
+calib-4.mp3
+Nice. Let's do that four more times so I can learn what yours looks like.
+
+calib-5.mp3
+Calibration complete. Try it now. Give your signal, and NeuroGrip will close.
+
+calib-6.mp3
+If it's not responding, take a breath, check the headset is snug, and we'll recalibrate together.

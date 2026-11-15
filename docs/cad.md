@@ -37,7 +37,7 @@ python render.py         # neurogrip_render.png and gear_mesh.png
    - `Gear_FingerSync`: 1:1 gear mate (the macro checks the fingers turn in opposite directions).
    - `Opening_Limit`: limit angle mate, 0–35°.
    - `Opening_Angle`: suppressed. Unsuppress and edit it to drive an exact opening.
-   - `Slide_Limit_0-15mm`: lets the clamp slide along the rail.
+   - `Slide_Limit`: lets the clamp slide along the dovetail rail (0–24 mm).
 5. You need default Part and Assembly templates set (**Tools → Options → Default Templates**). Mate names assume English SolidWorks, but the macro renames the default planes itself, so other languages work.
 
 The macro was written alongside the Python model and hasn't been run in every SolidWorks version. If a feature or mate fails, it is listed in the final message box and the macro keeps going. Please open an issue with that message.
@@ -50,9 +50,14 @@ Measure your servo with calipers first. SG90 clones vary.
 |---|---|---|---|
 | `HORN_SEAT` | `HORN_SEAT` | 29.5 | Servo body bottom to the underside of the horn arm |
 | `HORN_LEN`, `HORN_W0`, `HORN_W1`, `HORN_HUB_D` | same | 17.5, 6.4, 4.6, 7.6 | Single-arm horn size |
+| `HORN_FIT`, `RIB_D`, `RIB_IN` | same | 0.1, 1.2, 0.35 | Horn pocket press fit: clearance per side, crush rib size, and how far the ribs stick in. Raise `RIB_IN` for a tighter fit |
 | `WR_RI` | `WR_RI` | 38 | Wrist saddle radius. Smaller for small wrists |
 | `STRAP_LEN` | `STRAP_LEN` | 26 | Strap slot length. 26 for 25 mm velcro, 21 for 20 mm |
 | `FIT` | `FIT` | 0.25 | Clearance per side on pockets |
+| `DT_FIT` | `DT_FIT` | 0.25 | Clearance per side between the dovetail rail and the base groove |
+| `PIN_D`, `PIN_HOLE_D`, `PIN_BARB_D`, `PIN_SLOT_W` | same | 5.0, 5.4, 5.9, 1.6 | Idler snap pin: shank, gear hole, barb and split width |
+| `WIRE_TOP` | `WIRE_ABOVE_FLOOR` | 14.5 / 9.5 | Servo cable windows (Python: from the base bottom; macro: above the servo floor) |
+| `LOCK_PIN_D`, `LOCK_PITCH` | same | 2.2, 6 | Filament lock-pin hole, and the spacing of the rail positions |
 | `CD_EXTRA`, `BACKLASH` | same | 0.2, 0.2 | Gear centre-distance allowance and tooth backlash for FDM |
 | `M`, `Z` | `G_M`, `G_Z` | 1.5, 14 | Gear module and tooth count |
 | `SV_*` | `SV_*` | SG90 | Servo body. Change for an MG90S or another micro servo |

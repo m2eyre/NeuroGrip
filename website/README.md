@@ -1,5 +1,7 @@
 # NeuroGrip website
 
+**Live site:** https://neurogrip.base44.app
+
 This folder has everything needed to rebuild the NeuroGrip landing page: a working HTML reference version, the design assets, section-by-section screenshots, and the prompt we used with [Base44](https://base44.com/) (an AI app/site builder). You can rebuild it in Base44, in any other site builder, or host the HTML directly.
 
 | Path | What it is |
@@ -8,12 +10,13 @@ This folder has everything needed to rebuild the NeuroGrip landing page: a worki
 | `style-guide.html` | Colours, type, buttons and logo on one page |
 | `assets/` | Backgrounds, logos, 3D renders of the real CAD, icons |
 | `reference-screens/` | Screenshots of every section, for uploading to Base44 as references |
+| `audio/` | ElevenLabs narration MP3s (`story.mp3`, `calib-1…6.mp3`, all merged in `neurogrip-voice.mp3`) and the script they were made from |
 | `source/` | Scripts that regenerate the backgrounds, the HTML and the screenshots (see the end of this file) |
 
 ## Three ways to put the site online
 
 1. **Base44 (what we did):** follow the steps below.
-2. **GitHub Pages, no builder at all:** turn on Pages for this repository (see the upload guide) and the page is live at `https://m2eyre.github.io/<repo-name>/website/neurogrip-reference-site.html`.
+2. **GitHub Pages, no builder at all:** turn on Pages for this repository (see the upload guide) and the page is live at `https://m2eyre.github.io/neurogrip/website/neurogrip-reference-site.html`.
 3. **Any static host** (Netlify, Vercel, Cloudflare Pages): drag the `website/` folder in, and rename `neurogrip-reference-site.html` to `index.html` first.
 
 Things to fill in before it goes public: the demo video (section 03), team photos and names (section 06), and the links on the "Download the STLs" and "View on GitHub" buttons (point them at your repository's Releases page and main page).

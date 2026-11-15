@@ -4,7 +4,8 @@
 
 <p align="center"><b>Think it. Grip it.</b><br>
 An open-source, 3D-printed gripper you close with a jaw clench, read from an EEG headset.<br>
-About $15 in parts. Prints without supports. Takes any signal you can measure.</p>
+About $15 in parts. Prints without supports. Takes any signal you can measure.<br><br>
+  <a href="https://neurogrip.base44.app"><b>🌐 Live site: neurogrip.base44.app</b></a></p>
 
 <p align="center">
   <img src="docs/images/render-hero.png" alt="NeuroGrip gripper holding a ball" width="560">
@@ -48,9 +49,9 @@ Backups are built in: **SPACE** on the laptop and a **pushbutton** on the Nano b
 | Fingertip force | ≈ 0.35 kgf per tip (calculated for an SG90, not measured) |
 | Gears | 14 teeth, module 1.5, 21.2 mm centre distance |
 | Printing | 4 parts, PLA or PETG, no supports, ~40 g of filament |
-| Mount | Curved wrist saddle with a T-slot rail and a 25 mm velcro strap |
+| Mount | Curved wrist saddle with a slide-on dovetail rail and a 25 mm velcro strap (no screws) |
 | Signal | 8-channel EEG at 250 Hz (Unicorn), or any other source |
-| Controller | Arduino Nano R4 (other Arduinos should work, see the firmware notes) |
+| Controller | Arduino UNO Q in our build; a Nano or Nano R4 works too (see [wiring](docs/wiring.md)) |
 
 ## Bill of materials
 
@@ -61,11 +62,10 @@ Prices are typical online prices in USD, not quotes. Check your own receipts bef
 | Qty | Part | Notes | Approx. cost |
 |---|---|---|---|
 | 1 | SG90 micro servo | With its single-arm horn, horn screw and 2 tab screws | $2.50 |
-| 1 | Arduino Nano | We used a **Nano R4**. A Nano clone is about $5 | $5–15 |
+| 1 | Arduino board | We used an **Arduino UNO Q**. A Nano or Nano clone (about $5) also works | $5–45 |
 | ~40 g | PLA or PETG filament | PETG gives tougher gear teeth | $1.00 |
-| 1 | M3×12 screw + washer | Idler finger pivot (self-taps into the base) | |
-| 2 | M3×10 (or ×12) screws + 2 M3 nuts | Base to wrist rail | |
-| ~30 cm | 25 mm velcro strap | Through the wrist mount slots | $4.00 for screws, nuts and strap |
+| ~25 mm | 1.75 mm filament offcut | Lock pin for the base on the rail. The idler pivot is a printed snap pin, so no M3 hardware is needed | – |
+| ~30 cm | 25 mm velcro strap | Through the wrist mount slots | $4.00 |
 | – | Rubber bands or grip tape | Fingertip grip | $1.00 |
 | | | **Gripper total** | **≈ $13.50 with a clone Nano** |
 
@@ -147,7 +147,7 @@ neurogrip/
 | [docs/calibration.md](docs/calibration.md) | Servo angles, signal threshold, tuning, troubleshooting |
 | [docs/alternative-inputs.md](docs/alternative-inputs.md) | LSL streams, OpenBCI, Muse, BrainFlow, MyoWare EMG, keyboard, writing your own source |
 | [docs/cad.md](docs/cad.md) | SolidWorks macro, Python CAD, changing dimensions |
-| [website/README.md](website/README.md) | Rebuilding the project website in Base44 (or anywhere else) |
+| [website/README.md](website/README.md) | Rebuilding the project website in Base44 (or anywhere else). Live version: [neurogrip.base44.app](https://neurogrip.base44.app) |
 
 ## Why it matters
 

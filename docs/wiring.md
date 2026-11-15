@@ -37,4 +37,14 @@ To use a MyoWare 2.0 muscle sensor instead of (or as well as) the EEG headset, w
 
 Both boards plug into the laptop over USB. See [alternative inputs](alternative-inputs.md#emg-myoware-20).
 
+## Using an Arduino UNO Q
+
+![UNO Q wiring diagram](images/wiring_diagram_uno_q.png)
+
+The wiring is the same as above (servo signal on **D9**, separate servo supply, common ground, 470 µF capacitor). Three things differ on the UNO Q:
+
+- **3.3 V logic.** The UNO Q's header pins run at 3.3 V. The SG90 reads a 3.3 V signal fine, so D9 needs no level shifter.
+- **A0 and A1 are not 5 V tolerant.** If you wire a MyoWare (or any sensor) to a UNO Q, power it from **3.3V**, not 5V, so its output can't exceed 3.3 V. D3 is also only 3.6 V tolerant.
+- **Power.** Power the board from a 5 V / 3 A USB-C port or supply. Its 5V pin shares that budget with the board's own Linux processor, so only use it for a servo on the bench with no load. With the gripper on, use the separate servo supply.
+
 Next: [software setup](software-setup.md).
